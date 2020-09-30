@@ -13,42 +13,52 @@ class BytebankApp extends StatelessWidget {
   }
 }
 
-class FormularioTransferencia extends StatelessWidget {
+class FormularioTransferencia extends StatefulWidget {
   final TextEditingController _controladorCampoNumeroConta =
       TextEditingController();
   final TextEditingController _controladorCampoValor = TextEditingController();
 
+  @override
+  State<StatefulWidget> createState() {
+    return FormularioTransferenciaState();
+  }
+}
+
+class FormularioTransferenciaState extends State<FormularioTransferencia> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Criando Transferência'),
       ),
-      body: Column(
-        children: [
-          Editor(
-            rotulo: 'Número da conta',
-            dica: '0000',
-            controlador: _controladorCampoNumeroConta,
-          ),
-          Editor(
-            rotulo: 'Valor',
-            dica: '0.00',
-            controlador: _controladorCampoValor,
-            icone: Icon(Icons.monetization_on),
-          ),
-          RaisedButton(
-            child: Text('Confirmar'),
-            onPressed: () => _criaTransferencia(context),
-          )
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Editor(
+              rotulo: 'Número da conta',
+              dica: '0000',
+              controlador: widget._controladorCampoNumeroConta,
+            ),
+            Editor(
+              rotulo: 'Valor',
+              dica: '0.00',
+              controlador: widget._controladorCampoValor,
+              icone: Icon(Icons.monetization_on),
+            ),
+            RaisedButton(
+              child: Text('Confirmar'),
+              onPressed: () => _criaTransferencia(context),
+            )
+          ],
+        ),
       ),
     );
   }
 
   void _criaTransferencia(BuildContext context) {
-    final int numeroConta = int.tryParse(_controladorCampoNumeroConta.text);
-    final double valor = double.tryParse(_controladorCampoValor.text);
+    final int numeroConta =
+        int.tryParse(widget._controladorCampoNumeroConta.text);
+    final double valor = double.tryParse(widget._controladorCampoValor.text);
     if (numeroConta != null && valor != null) {
       final transferencia = Transferencia(valor, numeroConta);
       Navigator.pop(context, transferencia);
@@ -116,9 +126,9 @@ class ListaTransferenciasState extends State<ListaTransferencias> {
           }));
           future.then((transferenciaCriada) {
             debugPrint('$transferenciaCriada');
-            setState(() {
-              widget._transferencias.add(transferenciaCriada);
-            });
+            if (transferenciaCriada != null) {
+              setState(() => widget._transferencias.add(transferenciaCriada));
+            }
           });
         },
       ),
